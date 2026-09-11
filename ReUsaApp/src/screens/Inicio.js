@@ -1,81 +1,91 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, ActivityIndicator, Image } from 'react-native';
-import { collection, getDocs } from 'firebase/firestore';
-import { signOut } from 'firebase/auth';
-import { auth, db } from '../services/firebase';
+import { signOut } from "firebase/auth";
+import { collection, getDocs } from "firebase/firestore";
+import { useEffect, useState } from "react";
+import {
+  ActivityIndicator,
+  Alert,
+  FlatList,
+  Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+// Única modificación: Apuntamos a la nueva carpeta services y archivo firebase.js
+import { auth, db } from "../services/firebase";
 
 export default function Inicio({ navigation }) {
   const [objetos, setObjetos] = useState([]);
   const [cargando, setCargando] = useState(true);
 
-  useEffect(() => {
-    const obtenerObjetos = async () => {
-      try {
-        const querySnapshot = await getDocs(collection(db, "objetos"));
-        const listaObjetos = [];
-        
-        querySnapshot.forEach((doc) => {
-          listaObjetos.push({ id: doc.id, ...doc.data() });
-        });
-        
-        setObjetos(listaObjetos);
-      } catch (error) {
-        console.log("Error obteniendo objetos: ", error);
-      } finally {
-        setCargando(false);
-      }
-    };
-
-    obtenerObjetos();
-  }, []);
-
-  const handleLogout = () => {
-    signOut(auth).then(() => {
-      navigation.replace('Login');
-    }).catch((error) => {
-      console.log("Error al cerrar sesión:", error);
-    });
+  // Esta función va a Firestore y trae los documentos de la colección 'objetos'
+  const cargarObjetos = async () => {
+    try {
+      const querySnapshot = await getDocs(collection(db, "objetos"));
+      const listaObjetos = [];
+      querySnapshot.forEach((doc) => {
+        // Guardamos el ID del documento junto con los datos
+        listaObjetos.push({ id: doc.id, ...doc.data() });
+      });
+      setObjetos(listaObjetos);
+    } catch (error) {
+      console.log("Error de Firestore:", error);
+      Alert.alert("Error", error.message);
+    } finally {
+      setCargando(false);
+    }
   };
 
-  const renderItem = ({ item }) => (
-    <View style={styles.tarjeta}>
-      <View style={styles.infoContainer}>
-        {item.imagenUrl ? (
-          <Image source={{ uri: item.imagenUrl }} style={styles.imagen} />
-        ) : (
-          <View style={styles.imagenPlaceholder}>
-            <Text style={styles.textoPlaceholder}>Sin foto</Text>
-          </View>
-        )}
-        
-        <View style={styles.textoContainer}>
-          <Text style={styles.nombreObjeto}>{item.nombre}</Text>
-          <Text style={styles.textoDetalle}>Categoría: {item.categoria || "Material de estudio"}</Text>
-          <Text style={styles.textoDetalle}>Estado: {item.estado || "Usado"}</Text>
-          <Text style={styles.textoUbicacion}>📍 {item.ubicacion || "TdeA"}</Text>
-        </View>
-      </View>
+  // useEffect hace que la función se ejecute apenas carga la pantalla
+  useEffect(() => {
+    cargarObjetos();
+  }, []);
 
-      <TouchableOpacity 
-        style={styles.botonDetalle}
-        onPress={() => navigation.navigate('Detalle', { objeto: item })}
-      >
-        <Text style={styles.textoBoton}>Ver detalles</Text>
-      </TouchableOpacity>
+  const cerrarSesion = async () => {
+    try {
+      await signOut(auth);
+      navigation.replace("Login");
+    } catch (error) {
+      Alert.alert("Error", "Hubo un problema al cerrar sesión");
+    }
+  };
+
+  // Así se ve cada cuadrito de la lista
+  const renderItem = ({ item }) => (
+    <View style={styles.card}>
+      <Image source={{ uri: item.imagen }} style={styles.imagen} />
+      <View style={styles.infoContainer}>
+        <Text style={styles.nombre}>{item.nombre}</Text>
+        <Text style={styles.textoSecundario}>Categoría: {item.categoria}</Text>
+        <Text style={styles.textoSecundario}>Estado: {item.estado}</Text>
+        <Text style={styles.puntoEntrega}>📍 {item.puntoEntrega}</Text>
+
+        {/* Aquí está el botón para ir al Detalle */}
+        <TouchableOpacity
+          style={styles.btnDetalles}
+          onPress={() => navigation.navigate("Detalle", { objeto: item })}
+        >
+          <Text style={styles.btnDetallesTexto}>Ver detalles</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.titulo}>Catálogo ReUsa</Text>
-        <TouchableOpacity style={styles.botonSalir} onPress={handleLogout}>
-          <Text style={styles.textoSalir}>Salir</Text>
+        <Text style={styles.title}>Catálogo ReUsa</Text>
+        <TouchableOpacity style={styles.btnCerrar} onPress={cerrarSesion}>
+          <Text style={styles.btnCerrarText}>Salir</Text>
         </TouchableOpacity>
       </View>
 
       {cargando ? (
-        <ActivityIndicator size="large" color="#0066cc" style={styles.loader} />
+        <ActivityIndicator
+          size="large"
+          color="#0066cc"
+          style={{ marginTop: 50 }}
+        />
       ) : (
         <FlatList
           data={objetos}
@@ -83,7 +93,9 @@ export default function Inicio({ navigation }) {
           renderItem={renderItem}
           contentContainerStyle={styles.lista}
           ListEmptyComponent={
-            <Text style={styles.vacio}>No hay objetos disponibles en este momento.</Text>
+            <Text style={styles.vacio}>
+              No hay objetos disponibles en este momento.
+            </Text>
           }
         />
       )}
@@ -92,28 +104,61 @@ export default function Inicio({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f4f6f8', padding: 20 },
-  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, marginTop: 30 },
-  titulo: { fontSize: 24, fontWeight: 'bold', color: '#333' },
-  botonSalir: { backgroundColor: '#dc3545', paddingVertical: 8, paddingHorizontal: 15, borderRadius: 5 },
-  textoSalir: { color: '#fff', fontWeight: 'bold' },
-  loader: { marginTop: 50 },
-  lista: { paddingBottom: 30 },
-  tarjeta: { 
-    backgroundColor: '#eaeef2', 
-    padding: 15, 
-    borderRadius: 12, 
-    marginBottom: 15,
+  container: { flex: 1, backgroundColor: "#f5f5f5" },
+  header: {
+    flexDirection: "row",
+    justifyস্থিত: "space-between",
+    alignItems: "center",
+    padding: 20,
+    backgroundColor: "#fff",
+    borderBottomWidth: 1,
+    borderColor: "#ddd",
+    marginTop: 30, // Espacio para la barra de estado del celular
   },
-  infoContainer: { flexDirection: 'row', marginBottom: 15 },
-  imagen: { width: 80, height: 80, borderRadius: 8, marginRight: 15 },
-  imagenPlaceholder: { width: 80, height: 80, borderRadius: 8, marginRight: 15, backgroundColor: '#ccc', justifyContent: 'center', alignItems: 'center' },
-  textoPlaceholder: { color: '#666', fontSize: 12 },
-  textoContainer: { flex: 1, justifyContent: 'center' },
-  nombreObjeto: { fontSize: 18, fontWeight: 'bold', color: '#333', marginBottom: 4 },
-  textoDetalle: { fontSize: 14, color: '#555', marginBottom: 2 },
-  textoUbicacion: { fontSize: 14, color: '#0066cc', fontWeight: 'bold', marginTop: 4 },
-  botonDetalle: { backgroundColor: '#0047b3', padding: 12, borderRadius: 8, alignItems: 'center' },
-  textoBoton: { color: '#fff', fontWeight: 'bold', fontSize: 15 },
-  vacio: { textAlign: 'center', color: '#999', marginTop: 50, fontSize: 16 }
+  title: { fontSize: 22, fontWeight: "bold" },
+  btnCerrar: {
+    backgroundColor: "#dc3545",
+    paddingHorizontal: 15,
+    paddingVertical: 8,
+    borderRadius: 5,
+  },
+  btnCerrarText: { color: "#fff", fontWeight: "bold" },
+  lista: { padding: 15 },
+  card: {
+    backgroundColor: "#fff",
+    borderRadius: 8,
+    padding: 15,
+    marginBottom: 15,
+    flexDirection: "row",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  imagen: { width: 80, height: 80, borderRadius: 5, backgroundColor: "#eee" },
+  infoContainer: { marginLeft: 15, flex: 1, justifyContent: "center" },
+  nombre: { fontSize: 18, fontWeight: "bold", marginBottom: 5 },
+  textoSecundario: { color: "#555", fontSize: 14, marginBottom: 2 },
+  puntoEntrega: {
+    color: "#0066cc",
+    fontSize: 13,
+    marginTop: 5,
+    fontWeight: "500",
+  },
+  vacio: { textAlign: "center", marginTop: 50, color: "#666", fontSize: 16 },
+  /* Estilos del nuevo botón */
+  btnDetalles: {
+    backgroundColor: "#0066cc",
+    paddingVertical: 8,
+    paddingHorizontal: 15,
+    borderRadius: 5,
+    marginTop: 12,
+    alignSelf: "flex-start",
+  },
+  btnDetallesTexto: {
+    color: "#fff",
+    fontWeight: "bold",
+    fontSize: 13,
+  },
 });
