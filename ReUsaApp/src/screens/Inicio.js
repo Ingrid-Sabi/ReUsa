@@ -40,7 +40,6 @@ export default function Inicio({ navigation }) {
   const renderItem = ({ item }) => (
     <View style={styles.tarjeta}>
       <View style={styles.infoContainer}>
-        {/* Mostramos la imagen usando la URL de Firestore */}
         {item.imagenUrl ? (
           <Image source={{ uri: item.imagenUrl }} style={styles.imagen} />
         ) : (
@@ -109,4 +108,12 @@ const styles = StyleSheet.create({
   infoContainer: { flexDirection: 'row', marginBottom: 15 },
   imagen: { width: 80, height: 80, borderRadius: 8, marginRight: 15 },
   imagenPlaceholder: { width: 80, height: 80, borderRadius: 8, marginRight: 15, backgroundColor: '#ccc', justifyContent: 'center', alignItems: 'center' },
-  textoPlaceholder: { color: '#666', fontSize: 12 }
+  textoPlaceholder: { color: '#666', fontSize: 12 },
+  textoContainer: { flex: 1, justifyContent: 'center' },
+  nombreObjeto: { fontSize: 18, fontWeight: 'bold', color: '#333', marginBottom: 4 },
+  textoDetalle: { fontSize: 14, color: '#555', marginBottom: 2 },
+  textoUbicacion: { fontSize: 14, color: '#0066cc', fontWeight: 'bold', marginTop: 4 },
+  botonDetalle: { backgroundColor: '#0047b3', padding: 12, borderRadius: 8, alignItems: 'center' },
+  textoBoton: { color: '#fff', fontWeight: 'bold', fontSize: 15 },
+  vacio: { textAlign: 'center', color: '#999', marginTop: 50, fontSize: 16 }
+});
