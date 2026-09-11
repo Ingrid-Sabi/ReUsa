@@ -48,3 +48,15 @@ Join our community of developers creating universal apps.
 
 - [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
 - [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+
+## Entregable 1: Investigación de Campo
+
+A continuación, se presentan las evidencias de la investigación realizada en el campus TdeA:
+
+- [Informe de Hallazgos (PDF)](./docs/investigacion/Informe de Hallazgos y Matriz de Trazabilidad.pdf)
+- [investigacion/Informe de Hallazgos y Matriz de Trazabilidad (PDF)](./docs/investigacion/investigacion/Informe de Hallazgos y Matriz de Trazabilidad.pdf)
+- [Informe de Hallazgos (PDF)](./docs/investigacion/Ficha de Observación en Sitio - Proyecto ReUsa.pdf)
+- [investigacion/Ficha de Observación en Sitio - Proyecto ReUsa (PDF)](./docs/investigacion/investigacion/Ficha de Observación en Sitio - Proyecto ReUsa.pdf)
+- [Evidencia Fotográfica](./docs/investigacion/fotografias/)
+- [Registro de Entrevistas y Autorizaciones](./docs/investigacion/entrevistas/)
+- [Video de evidencia en campo](https://youtube.com/shorts/vy07oMgSDfk?feature=share)
