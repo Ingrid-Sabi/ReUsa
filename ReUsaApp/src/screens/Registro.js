@@ -43,7 +43,7 @@ export default function Registro({ navigation }) {
 
       <TextInput
         style={styles.input}
-        placeholder="Correo electrónico"
+        placeholder="Correo Institucional"
         value={email}
         onChangeText={setEmail}
         keyboardType="email-address"
@@ -52,7 +52,7 @@ export default function Registro({ navigation }) {
 
       <TextInput
         style={styles.input}
-        placeholder="Contraseña (mínimo 6 caracteres)"
+        placeholder="Contraseña"
         value={password}
         onChangeText={setPassword}
         secureTextEntry={true}
