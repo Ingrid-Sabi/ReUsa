@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, ActivityIndicator, Image } from 'react-native';
 import { collection, getDocs } from 'firebase/firestore';
-// Importación actualizada apuntando a la nueva carpeta de servicios
-import { db } from '../services/firebase';
+import { signOut } from 'firebase/auth';
+import { auth, db } from '../services/firebase';
 
 export default function Inicio({ navigation }) {
   const [objetos, setObjetos] = useState([]);
@@ -15,7 +15,6 @@ export default function Inicio({ navigation }) {
         const listaObjetos = [];
         
         querySnapshot.forEach((doc) => {
-          // Extraemos el ID del documento y lo unimos con el resto de los datos
           listaObjetos.push({ id: doc.id, ...doc.data() });
         });
         
@@ -30,18 +29,36 @@ export default function Inicio({ navigation }) {
     obtenerObjetos();
   }, []);
 
+  const handleLogout = () => {
+    signOut(auth).then(() => {
+      navigation.replace('Login');
+    }).catch((error) => {
+      console.log("Error al cerrar sesión:", error);
+    });
+  };
+
   const renderItem = ({ item }) => (
     <View style={styles.tarjeta}>
-      <Text style={styles.nombreObjeto}>{item.nombre}</Text>
-      
-      {/* Mostramos una pequeña descripción si existe */}
-      <Text style={styles.descripcionObjeto} numberOfLines={2}>
-        {item.descripcion || "Sin descripción adicional."}
-      </Text>
-      
+      <View style={styles.infoContainer}>
+        {/* Mostramos la imagen usando la URL de Firestore */}
+        {item.imagenUrl ? (
+          <Image source={{ uri: item.imagenUrl }} style={styles.imagen} />
+        ) : (
+          <View style={styles.imagenPlaceholder}>
+            <Text style={styles.textoPlaceholder}>Sin foto</Text>
+          </View>
+        )}
+        
+        <View style={styles.textoContainer}>
+          <Text style={styles.nombreObjeto}>{item.nombre}</Text>
+          <Text style={styles.textoDetalle}>Categoría: {item.categoria || "Material de estudio"}</Text>
+          <Text style={styles.textoDetalle}>Estado: {item.estado || "Usado"}</Text>
+          <Text style={styles.textoUbicacion}>📍 {item.ubicacion || "TdeA"}</Text>
+        </View>
+      </View>
+
       <TouchableOpacity 
         style={styles.botonDetalle}
-        // Aquí pasamos los datos del objeto a la pantalla de Detalle
         onPress={() => navigation.navigate('Detalle', { objeto: item })}
       >
         <Text style={styles.textoBoton}>Ver detalles</Text>
@@ -51,8 +68,12 @@ export default function Inicio({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.titulo}>Catálogo TdeA</Text>
-      <Text style={styles.subtitulo}>Objetos disponibles para donación</Text>
+      <View style={styles.header}>
+        <Text style={styles.titulo}>Catálogo ReUsa</Text>
+        <TouchableOpacity style={styles.botonSalir} onPress={handleLogout}>
+          <Text style={styles.textoSalir}>Salir</Text>
+        </TouchableOpacity>
+      </View>
 
       {cargando ? (
         <ActivityIndicator size="large" color="#0066cc" style={styles.loader} />
@@ -73,24 +94,19 @@ export default function Inicio({ navigation }) {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#f4f6f8', padding: 20 },
-  titulo: { fontSize: 26, fontWeight: 'bold', color: '#0066cc', marginBottom: 5, marginTop: 30 },
-  subtitulo: { fontSize: 16, color: '#555', marginBottom: 20 },
+  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, marginTop: 30 },
+  titulo: { fontSize: 24, fontWeight: 'bold', color: '#333' },
+  botonSalir: { backgroundColor: '#dc3545', paddingVertical: 8, paddingHorizontal: 15, borderRadius: 5 },
+  textoSalir: { color: '#fff', fontWeight: 'bold' },
   loader: { marginTop: 50 },
   lista: { paddingBottom: 30 },
   tarjeta: { 
-    backgroundColor: '#fff', 
-    padding: 18, 
+    backgroundColor: '#eaeef2', 
+    padding: 15, 
     borderRadius: 12, 
-    marginBottom: 15, 
-    elevation: 3, 
-    shadowColor: '#000', 
-    shadowOffset: { width: 0, height: 2 }, 
-    shadowOpacity: 0.1, 
-    shadowRadius: 4 
+    marginBottom: 15,
   },
-  nombreObjeto: { fontSize: 19, fontWeight: 'bold', color: '#333', marginBottom: 8 },
-  descripcionObjeto: { fontSize: 14, color: '#666', marginBottom: 15, lineHeight: 20 },
-  botonDetalle: { backgroundColor: '#0066cc', padding: 12, borderRadius: 8, alignItems: 'center' },
-  textoBoton: { color: '#fff', fontWeight: 'bold', fontSize: 15 },
-  vacio: { textAlign: 'center', color: '#999', marginTop: 50, fontSize: 16 }
-});
+  infoContainer: { flexDirection: 'row', marginBottom: 15 },
+  imagen: { width: 80, height: 80, borderRadius: 8, marginRight: 15 },
+  imagenPlaceholder: { width: 80, height: 80, borderRadius: 8, marginRight: 15, backgroundColor: '#ccc', justifyContent: 'center', alignItems: 'center' },
+  textoPlaceholder: { color: '#666', fontSize: 12 }
