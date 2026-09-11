@@ -58,5 +58,5 @@ A continuación, se presentan las evidencias de la investigación realizada en e
 - [Informe de Hallazgos (PDF)](./docs/investigacion/Ficha de Observación en Sitio - Proyecto ReUsa.pdf)
 - [investigacion/Ficha de Observación en Sitio - Proyecto ReUsa (PDF)](./docs/investigacion/investigacion/Ficha de Observación en Sitio - Proyecto ReUsa.pdf)
 - [Evidencia Fotográfica](./docs/investigacion/fotografias/)
-- [Registro de Entrevistas y Autorizaciones](./docs/investigacion/entrevistas/)
+- [Registro de Entrevistas y Autorizaciones](./docs/investigacion/entrevista/)
 - [Video de evidencia en campo](https://youtube.com/shorts/vy07oMgSDfk?feature=share)
