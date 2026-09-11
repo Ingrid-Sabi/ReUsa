@@ -10,7 +10,7 @@ import {
 } from "react-native";
 // Agregamos query, where y getDocs para poder hacer la validación antes de guardar
 import { addDoc, collection, getDocs, query, where } from "firebase/firestore";
-// Única modificación: Apuntamos a la nueva carpeta services
+
 import { auth, db } from "../services/firebase";
 
 export default function Solicitud({ route, navigation }) {

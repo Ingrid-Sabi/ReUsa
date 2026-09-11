@@ -1,12 +1,10 @@
-import React from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
-// Importamos las 5 pantallas temporales que ella acaba de crear
+import Detalle from "../screens/Detalle";
+import Inicio from "../screens/Inicio";
 import Login from "../screens/Login";
 import Registro from "../screens/Registro";
-import Inicio from "../screens/Inicio";
-import Detalle from "../screens/Detalle";
 import Solicitud from "../screens/Solicitud";
 
 const Stack = createNativeStackNavigator();

@@ -11,7 +11,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-// Única modificación: Apuntamos a la nueva carpeta services y archivo firebase.js
+
 import { auth, db } from "../services/firebase";
 
 export default function Inicio({ navigation }) {
@@ -113,7 +113,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     borderBottomWidth: 1,
     borderColor: "#ddd",
-    marginTop: 30, // Espacio para la barra de estado del celular
+    marginTop: 30,
   },
   title: { fontSize: 22, fontWeight: "bold" },
   btnCerrar: {
